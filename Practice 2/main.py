@@ -62,14 +62,15 @@ if __name__ == '__main__':
     model_3.summary()
 
     # Optimizer Stochastic Gradient Decent
-    optimizer = tf.keras.optimizers.SGD(learning_rate=0.03)
+    optimizer_1 = tf.keras.optimizers.SGD(learning_rate=0.03)
+    optimizer_2 = tf.keras.optimizers.Adam(learning_rate=0.03)
     loss = tf.keras.losses.MeanSquaredError()
 
     # Preparing the callback for retrieving the weights of the model on each epoch
     custom_callback = WeightHistoryCallback(layer_name='layer1')
 
-    model_1.compile(optimizer, loss)
-    history = model_1.fit(X, Y, epochs=500, callbacks=[custom_callback])
+    model_2.compile(optimizer_2, loss)
+    history = model_2.fit(X, Y, epochs=500, callbacks=[custom_callback])
 
     # Array of weights through all epochs, each row responds to one weight´s history
     neuron_weights_in_history = []
@@ -97,5 +98,5 @@ if __name__ == '__main__':
             break
 
     # Using Plotly to plot the weights´s history
-    fig = px.line(y=neuron_weights_in_history[0], title='Gráfico de Dispersión 2D')
+    fig = px.line(y=neuron_weights_in_history, title='Gráfico de Dispersión 2D')
     fig.show()
