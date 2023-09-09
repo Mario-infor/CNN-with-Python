@@ -7,13 +7,14 @@ import plotly.express as px
 
 
 class WeightHistoryCallback(keras.callbacks.Callback):
+    # Constructor for the class
     def __init__(self, layer_name):
         super(WeightHistoryCallback, self).__init__()
         self.layer_name = layer_name
-        self.weight_history = []
+        self.weight_history = []  # Array to save the weight of the model on each epoch
 
     def on_epoch_end(self, epoch, logs=None):
-        # Obtener el valor del peso específico al final de cada época
+        # Get specific weight value at the end of each epoch
         model_weights = self.model.get_layer(self.layer_name).get_weights()
         self.weight_history.append(model_weights)
 
@@ -24,6 +25,7 @@ if __name__ == '__main__':
     target = iris.target
     Y = to_categorical(target, dtype="uint8")
 
+    # Building the model of the neural network using Keras
     model = keras.Sequential(
         [
             layers.Dense(3, activation="sigmoid", name="layer1", input_shape=(4,)),
@@ -35,20 +37,25 @@ if __name__ == '__main__':
     )
     model.summary()
 
+    # Optimizer Stochastic Gradient Decent
     optimizer = tf.keras.optimizers.SGD(learning_rate=0.03)
     loss = tf.keras.losses.MeanSquaredError()
 
+    # Preparing the callback for retrieving the weights of the model on each epoch
     custom_callback = WeightHistoryCallback(layer_name='layer1')
 
     model.compile(optimizer, loss)
     history = model.fit(X, Y, epochs=500, callbacks=[custom_callback])
 
+    # Array of weights through all epochs, each row responds to one weight´s history
     neuron_weights_in_history = []
     single_weight_history = []
 
     i = 0
     j = 0
     k = 0
+
+    # Loop for ordering the weights values in order to plot them afterward
     while i < len(custom_callback.weight_history):
         j = 0
         while j < len(custom_callback.weight_history[i][0]):
@@ -65,5 +72,6 @@ if __name__ == '__main__':
         if k == len(custom_callback.weight_history[i][0][0]):
             break
 
+    # Using Plotly to plot the weights´s history
     fig = px.line(y=neuron_weights_in_history[0], title='Gráfico de Dispersión 2D')
     fig.show()
