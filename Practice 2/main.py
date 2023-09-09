@@ -26,7 +26,7 @@ if __name__ == '__main__':
     Y = to_categorical(target, dtype="uint8")
 
     # Building the model of the neural network using Keras
-    model = keras.Sequential(
+    model_1 = keras.Sequential(
         [
             layers.Dense(3, activation="sigmoid", name="layer1", input_shape=(4,)),
             # layers.Dense(3, activation="sigmoid", name="layer2"),
@@ -35,7 +35,31 @@ if __name__ == '__main__':
             layers.Dense(3, activation="softmax", name="output_layer"),
         ]
     )
-    model.summary()
+    model_1.summary()
+
+    # Building the model of the neural network using Keras
+    model_2 = keras.Sequential(
+        [
+            layers.Dense(3, activation="relu", name="layer1", input_shape=(4,)),
+            # layers.Dense(3, activation="relu", name="layer2"),
+            # layers.Dense(3, activation="relu", name="layer3"),
+            # layers.Dense(3, activation="relu", name="layer4"),
+            layers.Dense(3, activation="softmax", name="output_layer"),
+        ]
+    )
+    model_2.summary()
+
+    # Building the model of the neural network using Keras
+    model_3 = keras.Sequential(
+        [
+            layers.Dense(3, activation="tanh", name="layer1", input_shape=(4,)),
+            # layers.Dense(3, activation="tanh", name="layer2"),
+            # layers.Dense(3, activation="tanh", name="layer3"),
+            # layers.Dense(3, activation="tanh", name="layer4"),
+            layers.Dense(3, activation="softmax", name="output_layer"),
+        ]
+    )
+    model_3.summary()
 
     # Optimizer Stochastic Gradient Decent
     optimizer = tf.keras.optimizers.SGD(learning_rate=0.03)
@@ -44,8 +68,8 @@ if __name__ == '__main__':
     # Preparing the callback for retrieving the weights of the model on each epoch
     custom_callback = WeightHistoryCallback(layer_name='layer1')
 
-    model.compile(optimizer, loss)
-    history = model.fit(X, Y, epochs=500, callbacks=[custom_callback])
+    model_1.compile(optimizer, loss)
+    history = model_1.fit(X, Y, epochs=500, callbacks=[custom_callback])
 
     # Array of weights through all epochs, each row responds to one weight´s history
     neuron_weights_in_history = []
