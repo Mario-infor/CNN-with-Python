@@ -1,9 +1,10 @@
+import plotly.express as px
 import tensorflow as tf
 from keras import layers
+from keras.callbacks import TensorBoard
 from keras.utils import to_categorical
 from sklearn import datasets
 from tensorflow import keras
-import plotly.express as px
 
 
 class WeightHistoryCallback(keras.callbacks.Callback):
@@ -61,8 +62,12 @@ if __name__ == '__main__':
     )
     model_3.summary()
 
+    # Using TensorBoard to see the model evolving
+    tensorflow = TensorBoard(log_dir="logs/", histogram_freq=1, embeddings_data=True)
+
     # Optimizer Stochastic Gradient Decent
     optimizer_1 = tf.keras.optimizers.SGD(learning_rate=0.03)
+    # Optimizer Adam
     optimizer_2 = tf.keras.optimizers.Adam(learning_rate=0.03)
     loss = tf.keras.losses.MeanSquaredError()
 
@@ -70,7 +75,7 @@ if __name__ == '__main__':
     custom_callback = WeightHistoryCallback(layer_name='layer1')
 
     model_2.compile(optimizer_2, loss)
-    history = model_2.fit(X, Y, epochs=500, callbacks=[custom_callback])
+    history = model_2.fit(X, Y, epochs=500, callbacks=[custom_callback, tensorflow])
 
     # Array of weights through all epochs, each row responds to one weight´s history
     neuron_weights_in_history = []
