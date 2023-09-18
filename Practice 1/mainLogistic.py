@@ -50,7 +50,7 @@ if __name__ == '__main__':
             x2.append(X[i])
             y2.append(Y[i])
 
-    alpha = 0.05
+    alpha = 0.00009
     iterations = 100
 
     w0 = random() - 0.5
