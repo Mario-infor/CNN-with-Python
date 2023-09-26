@@ -58,9 +58,9 @@ if __name__ == '__main__':
             x2.append(X[i])
             y2.append(Y[i])
 
-    alpha = 0.0009
-    iterations = 100
-    sigma = 1
+    alpha = 0.005
+    iterations = 1000
+    sigma = 1.5
 
     w0 = 0.8
     w1 = random() - 0.5
@@ -77,13 +77,14 @@ if __name__ == '__main__':
     y = np.linspace(-10.0, 10.0, 100)
     X, Y = np.meshgrid(x, y)
 
-    temp_miu_x = np.linspace(-10.0, 10.0, 9)
-    temp_miu_y = np.linspace(-10.0, 10.0, 9)
+    temp_miu_x = np.linspace(-7.0, 7.0, 3)
+    temp_miu_y = np.linspace(-7.0, 7.0, 3)
 
     gauss_centers = []
 
-    for i in range(len(temp_miu_x)):
-        gauss_centers.append([temp_miu_x[i], temp_miu_y[i]])
+    for i in temp_miu_x:
+        for j in temp_miu_y:
+            gauss_centers.append([i, j])
 
     G1 = gaussian(X, Y, gauss_centers[0], sigma)
     G2 = gaussian(X, Y, gauss_centers[1], sigma)
@@ -95,7 +96,7 @@ if __name__ == '__main__':
     G8 = gaussian(X, Y, gauss_centers[7], sigma)
     G9 = gaussian(X, Y, gauss_centers[8], sigma)
 
-    F = w0 + w1 * G1 + w2 * G2 + w3 * G3 + w4 * G4 + w4 * G5 + w4 * G6 + w4 * G7 + w4 * G8 + w4 * G9
+    F = w0 + w1 * G1 + w2 * G2 + w3 * G3 + w4 * G4 + w5 * G5 + w6 * G6 + w7 * G7 + w8 * G8 + w9 * G9
     G = 1 / (1 + np.exp(-F))
 
     z1 = np.full(len(x1), 0.9)
@@ -122,7 +123,7 @@ if __name__ == '__main__':
                     w6 * gaussian(x1[i], y1[i], gauss_centers[5], sigma) +
                     w7 * gaussian(x1[i], y1[i], gauss_centers[6], sigma) +
                     w8 * gaussian(x1[i], y1[i], gauss_centers[7], sigma) +
-                    w8 * gaussian(x1[i], y1[i], gauss_centers[8], sigma)
+                    w9 * gaussian(x1[i], y1[i], gauss_centers[8], sigma)
                  )
             G = 1 / (1 + np.exp(-H))
             #w0 = w0 + alpha * (1 - G)
@@ -147,10 +148,10 @@ if __name__ == '__main__':
                     w6 * gaussian(x2[i], y2[i], gauss_centers[5], sigma) +
                     w7 * gaussian(x2[i], y2[i], gauss_centers[6], sigma) +
                     w8 * gaussian(x2[i], y2[i], gauss_centers[7], sigma) +
-                    w8 * gaussian(x2[i], y2[i], gauss_centers[8], sigma)
+                    w9 * gaussian(x2[i], y2[i], gauss_centers[8], sigma)
             )
             G = 1 / (1 + np.exp(-H))
-            # w0 = w0 + alpha * (1 - G)
+            #w0 = w0 + alpha * (1 - G)
             w1 = w1 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[0], sigma)
             w2 = w2 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[1], sigma)
             w3 = w3 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[2], sigma)
@@ -177,13 +178,13 @@ if __name__ == '__main__':
         train_error = np.sqrt(train_error)
         train_error_list.append(train_error)
 
-        if ite % 10 == 0:
-            F = w0 + w1 * G1 + w2 * G2 + w3 * G3 + w4 * G4 + w4 * G5 + w4 * G6 + w4 * G7 + w4 * G8 + w4 * G9
+        if ite % 100 == 0:
+            F = w0 + w1 * G1 + w2 * G2 + w3 * G3 + w4 * G4 + w5 * G5 + w6 * G6 + w7 * G7 + w8 * G8 + w9 * G9
             G = 1 / (1 + np.exp(-F))
 
             trace2 = go.Surface(z=G, x=X, y=Y, colorscale='Viridis', showscale=False, opacity=0.5)
             fig = go.Figure(data=[trace1, trace2])
             fig.show()
 
-    print(w0, w1, w2, w3, w4)
+    print(w0, w1, w2, w3, w4, w5, w6, w7, w8, w9)
     plt.plot(train_error_list)
