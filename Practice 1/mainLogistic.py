@@ -1,6 +1,5 @@
 from random import random
 from random import seed
-
 import matplotlib.pyplot as plt
 import numpy as np
 import plotly.graph_objects as go
@@ -100,7 +99,6 @@ if __name__ == '__main__':
 
         train_error = 0
 
-        # Calculating error of the current model with POSITIVE examples
         for i in range(len(x1)):
             g, tag = error(x1[i], y1[i])
             error_value = (g - 1) ** 2
