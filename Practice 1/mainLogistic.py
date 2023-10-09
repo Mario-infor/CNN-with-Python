@@ -1,33 +1,39 @@
 from random import random
 from random import seed
+
 import matplotlib.pyplot as plt
 import numpy as np
 import plotly.graph_objects as go
 
+w_list = [random() - 0.5] * 10
+centers = []
+sigma = 1.5
+alpha = 0.005
+iterations = 1000
+gauss_count = 9
+loop_size = 3
+TOTAL_NUM = 500
 
-def error(x_error, y_error):
-    # h_error = w0 + w1 * x_error + w2 * x_error + w3 * (x_error * y_error) + w4 * (x_error ** 2) + w5 * (x_error ** 2)
-    h_error = (
-                    w0 +
-                    w1 * gaussian(x_error, y_error, gauss_centers[0], sigma) +
-                    w2 * gaussian(x_error, y_error, gauss_centers[1], sigma) +
-                    w3 * gaussian(x_error, y_error, gauss_centers[2], sigma) +
-                    w4 * gaussian(x_error, y_error, gauss_centers[3], sigma) +
-                    w5 * gaussian(x_error, y_error, gauss_centers[4], sigma) +
-                    w6 * gaussian(x_error, y_error, gauss_centers[5], sigma) +
-                    w7 * gaussian(x_error, y_error, gauss_centers[6], sigma) +
-                    w8 * gaussian(x_error, y_error, gauss_centers[7], sigma) +
-                    w8 * gaussian(x_error, y_error, gauss_centers[8], sigma)
-                 )
-    g_error = 1 / (1 + np.power(np.exp(1), (-1 * h_error)))
-    if g_error >= 0.5:
-        return g_error, "Red"
+
+def error(x, y):
+    g = calculate_g(x, y)
+    if g >= 0.5:
+        return g, "Red"
     else:
-        return g_error, "Blue"
+        return g, "Blue"
 
 
-def gaussian(x_val, y_val, center, sigma_error):
-    return np.exp(-((x_val - center[0]) ** 2 / (2 * sigma_error ** 2) + (y_val - center[1]) ** 2 / (2 * sigma_error ** 2)))
+def gaussian(x_val, y_val, center, sigma):
+    return np.exp(
+        -((x_val - center[0]) ** 2 / (2 * sigma ** 2) + (y_val - center[1]) ** 2 / (2 * sigma ** 2)))
+
+
+def calculate_g(x, y):
+    h = w_list[0]
+    for i in range(1, len(w_list)):
+        h += w_list[i] * gaussian(x, y, centers[i - 1], sigma)
+    g = 1 / (1 + np.exp(-h))
+    return g
 
 
 if __name__ == '__main__':
@@ -43,8 +49,6 @@ if __name__ == '__main__':
     x2 = []
     y2 = []
 
-    TOTAL_NUM = 500
-
     for _ in range(TOTAL_NUM):
         X.append(random() * 20 - 10)
         Y.append(random() * 20 - 10)
@@ -58,53 +62,27 @@ if __name__ == '__main__':
             x2.append(X[i])
             y2.append(Y[i])
 
-    alpha = 0.005
-    iterations = 1000
-    sigma = 1.5
+    step_size = (max(X)-min(X)) / loop_size
+    vertex_initial_pos = min(X) + step_size / 2
+    temp = vertex_initial_pos
 
-    w0 = 0.8
-    w1 = random() - 0.5
-    w2 = random() - 0.5
-    w3 = random() - 0.5
-    w4 = random() - 0.5
-    w5 = random() - 0.5
-    w6 = random() - 0.5
-    w7 = random() - 0.5
-    w8 = random() - 0.5
-    w9 = random() - 0.5
+    for i in range(0, loop_size):
+        for j in range(0, loop_size):
+            centers.append([temp, vertex_initial_pos + (step_size * j)])
+        temp += step_size
 
-    x = np.linspace(-10.0, 10.0, 100)
-    y = np.linspace(-10.0, 10.0, 100)
-    X, Y = np.meshgrid(x, y)
+    x = np.linspace(min(X), max(X), 100)
+    y = np.linspace(min(Y), max(Y), 100)
+    X_mesh, Y_mesh = np.meshgrid(x, y)
 
-    temp_miu_x = np.linspace(-7.0, 7.0, 3)
-    temp_miu_y = np.linspace(-7.0, 7.0, 3)
+    g = calculate_g(X_mesh, Y_mesh)
 
-    gauss_centers = []
-
-    for i in temp_miu_x:
-        for j in temp_miu_y:
-            gauss_centers.append([i, j])
-
-    G1 = gaussian(X, Y, gauss_centers[0], sigma)
-    G2 = gaussian(X, Y, gauss_centers[1], sigma)
-    G3 = gaussian(X, Y, gauss_centers[2], sigma)
-    G4 = gaussian(X, Y, gauss_centers[3], sigma)
-    G5 = gaussian(X, Y, gauss_centers[4], sigma)
-    G6 = gaussian(X, Y, gauss_centers[5], sigma)
-    G7 = gaussian(X, Y, gauss_centers[6], sigma)
-    G8 = gaussian(X, Y, gauss_centers[7], sigma)
-    G9 = gaussian(X, Y, gauss_centers[8], sigma)
-
-    F = w0 + w1 * G1 + w2 * G2 + w3 * G3 + w4 * G4 + w5 * G5 + w6 * G6 + w7 * G7 + w8 * G8 + w9 * G9
-    G = 1 / (1 + np.exp(-F))
-
-    z1 = np.full(len(x1), 0.9)
-    z2 = np.full(len(x2), 1)
+    z1 = np.full(len(x1), 0.5)
+    z2 = np.full(len(x2), 0.8)
     z = np.concatenate((z1, z2))
 
     trace1 = go.Scatter3d(x=x1 + x2, y=y1 + y2, z=z, mode='markers', marker=dict(size=5, color=z))
-    trace2 = go.Surface(z=G, x=X, y=Y, colorscale='Viridis', showscale=False, opacity=0.5)
+    trace2 = go.Surface(z=g, x=X_mesh, y=Y_mesh, colorscale='Viridis', showscale=False, opacity=0.5)
 
     fig = go.Figure(data=[trace1, trace2])
     fig.show()
@@ -113,54 +91,11 @@ if __name__ == '__main__':
     for ite in range(iterations):
         # Positive examples
         for i in range(len(x1)):
-            H = (
-                    w0 +
-                    w1 * gaussian(x1[i], y1[i], gauss_centers[0], sigma) +
-                    w2 * gaussian(x1[i], y1[i], gauss_centers[1], sigma) +
-                    w3 * gaussian(x1[i], y1[i], gauss_centers[2], sigma) +
-                    w4 * gaussian(x1[i], y1[i], gauss_centers[3], sigma) +
-                    w5 * gaussian(x1[i], y1[i], gauss_centers[4], sigma) +
-                    w6 * gaussian(x1[i], y1[i], gauss_centers[5], sigma) +
-                    w7 * gaussian(x1[i], y1[i], gauss_centers[6], sigma) +
-                    w8 * gaussian(x1[i], y1[i], gauss_centers[7], sigma) +
-                    w9 * gaussian(x1[i], y1[i], gauss_centers[8], sigma)
-                 )
-            G = 1 / (1 + np.exp(-H))
-            #w0 = w0 + alpha * (1 - G)
-            w1 = w1 + alpha * (1 - G) * gaussian(x1[i], y1[i], gauss_centers[0], sigma)
-            w2 = w2 + alpha * (1 - G) * gaussian(x1[i], y1[i], gauss_centers[1], sigma)
-            w3 = w3 + alpha * (1 - G) * gaussian(x1[i], y1[i], gauss_centers[2], sigma)
-            w4 = w4 + alpha * (1 - G) * gaussian(x1[i], y1[i], gauss_centers[3], sigma)
-            w5 = w5 + alpha * (1 - G) * gaussian(x1[i], y1[i], gauss_centers[4], sigma)
-            w6 = w6 + alpha * (1 - G) * gaussian(x1[i], y1[i], gauss_centers[5], sigma)
-            w7 = w7 + alpha * (1 - G) * gaussian(x1[i], y1[i], gauss_centers[6], sigma)
-            w8 = w8 + alpha * (1 - G) * gaussian(x1[i], y1[i], gauss_centers[7], sigma)
-            w9 = w9 + alpha * (1 - G) * gaussian(x1[i], y1[i], gauss_centers[8], sigma)
-        # Negative examples
-        for i in range(len(x2)):
-            H = (
-                    w0 +
-                    w1 * gaussian(x2[i], y2[i], gauss_centers[0], sigma) +
-                    w2 * gaussian(x2[i], y2[i], gauss_centers[1], sigma) +
-                    w3 * gaussian(x2[i], y2[i], gauss_centers[2], sigma) +
-                    w4 * gaussian(x2[i], y2[i], gauss_centers[3], sigma) +
-                    w5 * gaussian(x2[i], y2[i], gauss_centers[4], sigma) +
-                    w6 * gaussian(x2[i], y2[i], gauss_centers[5], sigma) +
-                    w7 * gaussian(x2[i], y2[i], gauss_centers[6], sigma) +
-                    w8 * gaussian(x2[i], y2[i], gauss_centers[7], sigma) +
-                    w9 * gaussian(x2[i], y2[i], gauss_centers[8], sigma)
-            )
-            G = 1 / (1 + np.exp(-H))
-            #w0 = w0 + alpha * (1 - G)
-            w1 = w1 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[0], sigma)
-            w2 = w2 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[1], sigma)
-            w3 = w3 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[2], sigma)
-            w4 = w4 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[3], sigma)
-            w5 = w5 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[4], sigma)
-            w6 = w6 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[5], sigma)
-            w7 = w7 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[6], sigma)
-            w8 = w8 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[7], sigma)
-            w9 = w9 + alpha * (1 - G) * gaussian(x2[i], y2[i], gauss_centers[8], sigma)
+            g = calculate_g(x1, y1)
+
+            w_list[0] = w_list[0] + alpha * (1 - g)
+            for j in range(len(w_list)):
+                w_list[j] = w_list[j] + alpha * (1 - g) * gaussian(x1[i], y1[i], centers[j], sigma)
 
         train_error = 0
 
@@ -170,21 +105,14 @@ if __name__ == '__main__':
             error_value = (g - 1) ** 2
             train_error += error_value
 
-        # Calculating error of the current model with NEGATIVE examples
-        for i in range(len(x2)):
-            g, tag = error(x2[i], y2[i])
-            error_value = (g - 0) ** 2
-            train_error += error_value
-        train_error = np.sqrt(train_error)
         train_error_list.append(train_error)
 
         if ite % 100 == 0:
-            F = w0 + w1 * G1 + w2 * G2 + w3 * G3 + w4 * G4 + w5 * G5 + w6 * G6 + w7 * G7 + w8 * G8 + w9 * G9
-            G = 1 / (1 + np.exp(-F))
+            g = calculate_g(X, Y)
 
-            trace2 = go.Surface(z=G, x=X, y=Y, colorscale='Viridis', showscale=False, opacity=0.5)
+            trace2 = go.Surface(z=g, x=X, y=Y, colorscale='Viridis', showscale=False, opacity=0.5)
             fig = go.Figure(data=[trace1, trace2])
             fig.show()
 
-    print(w0, w1, w2, w3, w4, w5, w6, w7, w8, w9)
+    print(w_list)
     plt.plot(train_error_list)
