@@ -5,13 +5,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import plotly.graph_objects as go
 
-w_list = [random() - 0.5] * 10
+
 centers = []
-sigma = 1.5
+sigma = 1.2
 alpha = 0.005
-iterations = 1000
-gauss_count = 9
-loop_size = 3
+iterations = 2000
+gauss_count = 25
+loop_size = 5
+w_list = [0] * (gauss_count + 1)
 TOTAL_NUM = 500
 
 
@@ -77,8 +78,8 @@ if __name__ == '__main__':
 
     g = calculate_g(X_mesh, Y_mesh)
 
-    z1 = np.full(len(x1), 0.5)
-    z2 = np.full(len(x2), 0.8)
+    z1 = np.full(len(x1), 0.9)
+    z2 = np.full(len(x2), 1)
     z = np.concatenate((z1, z2))
 
     trace1 = go.Scatter3d(x=x1 + x2, y=y1 + y2, z=z, mode='markers', marker=dict(size=5, color=z))
@@ -91,11 +92,11 @@ if __name__ == '__main__':
     for ite in range(iterations):
         # Positive examples
         for i in range(len(x1)):
-            g = calculate_g(x1, y1)
+            g = calculate_g(x1[i], y1[i])
 
-            w_list[0] = w_list[0] + alpha * (1 - g)
-            for j in range(len(w_list)):
-                w_list[j] = w_list[j] + alpha * (1 - g) * gaussian(x1[i], y1[i], centers[j], sigma)
+            #w_list[0] = w_list[0] + alpha * (1 - g)
+            for j in range(1, len(w_list)):
+                w_list[j] = w_list[j] + alpha * (1 - g) * gaussian(x1[i], y1[i], centers[j-1], sigma)
 
         train_error = 0
 
@@ -108,9 +109,9 @@ if __name__ == '__main__':
         train_error_list.append(train_error)
 
         if ite % 100 == 0:
-            g = calculate_g(X, Y)
+            g = calculate_g(X_mesh, Y_mesh)
 
-            trace2 = go.Surface(z=g, x=X, y=Y, colorscale='Viridis', showscale=False, opacity=0.5)
+            trace2 = go.Surface(z=g, x=X_mesh, y=Y_mesh, colorscale='Viridis', showscale=False, opacity=0.5)
             fig = go.Figure(data=[trace1, trace2])
             fig.show()
 
