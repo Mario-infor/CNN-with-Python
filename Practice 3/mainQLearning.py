@@ -28,7 +28,7 @@ if __name__ == '__main__':
             break
         elif keyboard.is_pressed('up') and not action:
             if pos_x - 1 >= 0:
-                print("Moving down!")
+                print("Moving up!")
                 clear_previous_move(pos_x, pos_y, ambient)
                 pos_x -= 1
                 move(pos_x, pos_y, ambient)
