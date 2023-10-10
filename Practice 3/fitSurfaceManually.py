@@ -4,8 +4,8 @@ import plotly.graph_objects as go
 
 centers = []
 sigma = 0.1
-alpha = 0.0001
-iterations = 1000
+alpha = 0.1
+iterations = 100
 loop_size = 5
 gauss_count = loop_size * loop_size
 w_list = np.random.rand(gauss_count) - 0.5
@@ -99,4 +99,4 @@ if __name__ == '__main__':
     plt.show()
 
     print(w_list)
-    #plt.plot(train_error_list)
+    # plt.plot(train_error_list)

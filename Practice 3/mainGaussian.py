@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
 
-sigma = 0.1
+sigma = 0.5
 centers = []
-gauss_count = 25
-loop_size = 5
+loop_size = 6
+gauss_count = loop_size * loop_size
 w_list = [.5] * (gauss_count + 1)
 
 
@@ -14,7 +14,7 @@ def gaussian(x_val, y_val, center, sigma_error):
         -((x_val - center[0]) ** 2 / (2 * sigma_error ** 2) + (y_val - center[1]) ** 2 / (2 * sigma_error ** 2)))
 
 
-def model_simple(xy, *amplitudes):
+def model(xy, *amplitudes):
     x, y = xy
     h = amplitudes[0]
     for i in range(1, len(amplitudes)):
@@ -40,7 +40,7 @@ if __name__ == '__main__':
         temp += step_size
 
     # Perform curve fitting
-    w_opt, _ = curve_fit(model_simple, (x, y), z, p0=w_list)
+    w_opt, _ = curve_fit(model, (x, y), z, p0=w_list)
 
     # Print optimized parameters
     print(w_opt)
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     x_range = np.linspace(0, 1, 50)
     y_range = np.linspace(0, 1, 50)
     X, Y = np.meshgrid(x_range, y_range)
-    Z = model_simple((X, Y), *w_opt)
+    Z = model((X, Y), *w_opt)
     ax.plot_surface(X, Y, Z, color='red', alpha=1)
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
