@@ -24,11 +24,11 @@ def model_simple(xy, *amplitudes):
 
 if __name__ == '__main__':
     # load data
-    data_Dayan: np.array = np.loadtxt('data_3d.csv', delimiter=',').T
+    data: np.array = np.loadtxt('data_3d.csv', delimiter=',').T
 
-    X_Dayan = data_Dayan[0]
-    Y_Dayan = data_Dayan[1]
-    Z_Dayan = data_Dayan[2]
+    x = data[0]
+    y = data[1]
+    z = data[2]
 
     step_size = 1 / loop_size
     vertex_pos = step_size / 2
@@ -40,7 +40,7 @@ if __name__ == '__main__':
         temp += step_size
 
     # Perform curve fitting
-    w_opt, _ = curve_fit(model_simple, (X_Dayan, Y_Dayan), Z_Dayan, p0=w_list)
+    w_opt, _ = curve_fit(model_simple, (x, y), z, p0=w_list)
 
     # Print optimized parameters
     print(w_opt)
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     # Create 3D plot of the data points and the fitted curve
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(X_Dayan, Y_Dayan, Z_Dayan, color='blue', alpha=0.1)
+    ax.scatter(x, y, z, color='blue', alpha=0.1)
     x_range = np.linspace(0, 1, 50)
     y_range = np.linspace(0, 1, 50)
     X, Y = np.meshgrid(x_range, y_range)
