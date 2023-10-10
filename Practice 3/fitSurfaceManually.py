@@ -54,11 +54,22 @@ if __name__ == '__main__':
 
     h = calculate_h(x_surface, y_surface)
 
-    trace1 = go.Scatter3d(x=x, y=y, z=z, mode='markers', marker=dict(size=5, color=z))
-    trace2 = go.Surface(z=h, x=x_surface, y=y_surface, colorscale='Viridis', opacity=0.5)
+    # trace1 = go.Scatter3d(x=x, y=y, z=z, mode='markers', marker=dict(size=5, color=z))
+    # trace2 = go.Surface(z=h, x=x_surface, y=y_surface, colorscale='Viridis', opacity=0.5)
+    #
+    # fig = go.Figure(data=[trace1, trace2])
+    # fig.show()
 
-    fig = go.Figure(data=[trace1, trace2])
-    fig.show()
+    # Create 3D plot of the data points and the fitted curve
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z, color='blue', alpha=0.1)
+    Z = calculate_h(x_surface, y_surface)
+    ax.plot_surface(x_surface, y_surface, Z, color='red', alpha=1)
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    plt.show()
 
     # train_error_list = []
     for ite in range(iterations):
@@ -72,26 +83,20 @@ if __name__ == '__main__':
 
         # train_error_list.append(error_value)
 
-        if ite % 100 == 0:
-            print(w_list)
-            h = calculate_h(x_surface, y_surface)
-            trace2 = go.Surface(z=h, x=x_surface, y=y_surface, colorscale='Viridis', opacity=0.5)
-            fig = go.Figure(data=[trace1, trace2])
-            fig.show()
+        # if ite % 100 == 0:
+        #     print(w_list)
+        #     h = calculate_h(x_surface, y_surface)
+            # trace2 = go.Surface(z=h, x=x_surface, y=y_surface, colorscale='Viridis', opacity=0.5)
+            # fig = go.Figure(data=[trace1, trace2])
+            # fig.show()
+            # Create 3D plot of the data points and the fitted curve
 
-    # Create 3D plot of the data points and the fitted curve
-    # fig = plt.figure()
-    # ax = fig.add_subplot(111, projection='3d')
-    # ax.scatter(x, y, z, color='blue', alpha=0.1)
-    # x_range = np.linspace(0, 1, 100)
-    # y_range = np.linspace(0, 1, 100)
-    # X, Y = np.meshgrid(x_range, y_range)
-    # Z = calculate_g(X, Y)
-    # ax.plot_surface(X, Y, Z, color='red', alpha=1)
-    # ax.set_xlabel('X')
-    # ax.set_ylabel('Y')
-    # ax.set_zlabel('Z')
-    # plt.show()
+    h = calculate_h(x_surface, y_surface)
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(x, y, z, color='blue', alpha=0.1)
+    ax.plot_surface(x_surface, y_surface, h, color='red', alpha=1)
+    plt.show()
 
     print(w_list)
     #plt.plot(train_error_list)
