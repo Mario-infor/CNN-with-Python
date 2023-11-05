@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import plotly.graph_objects as go
 
+# Global parameters and hyperparameters.
 centers = []
 sigma = 0.1
 alpha = 0.1
@@ -12,22 +13,25 @@ w_list = np.random.rand(gauss_count) - 0.5
 TOTAL_NUM = 500
 
 
-def error(x, y, z):
-    h = calculate_h(x, y)
-    return ((z - h) ** 2).mean()
+# Calculate error of the surface.
+def error(_x, _y, _z):
+    _h = calculate_h(_x, _y)
+    return ((_z - _h) ** 2).mean()
 
 
-def gaussian(x_val, y_val, center, sigma):
-    return np.exp(-((x_val - center[0]) ** 2 / (2 * sigma ** 2) + (y_val - center[1]) ** 2 / (2 * sigma ** 2)))
+# Evaluate a coordinate (x, y) on one gaussian curve.
+def gaussian(x_val, y_val, center, _sigma):
+    return np.exp(-((x_val - center[0]) ** 2 / (2 * _sigma ** 2) + (y_val - center[1]) ** 2 / (2 * _sigma ** 2)))
 
 
-def calculate_h(x, y):
+# Evaluate coordinate (x, y) on all gaussian curves on the surface.
+def calculate_h(_x, _y):
     # h = w_list[0]
-    h = 0
-    for i in range(len(w_list)):
-        h += w_list[i] * gaussian(x, y, centers[i], sigma)
+    _h = 0
+    for _i in range(len(w_list)):
+        _h += w_list[_i] * gaussian(_x, _y, centers[_i], sigma)
     # g = 1 / (1 + np.exp(h))
-    return h
+    return _h
 
 
 if __name__ == '__main__':
@@ -52,15 +56,15 @@ if __name__ == '__main__':
     mesh_y = np.linspace(min(y), max(y), 100)
     x_surface, y_surface = np.meshgrid(mesh_x, mesh_y)
 
-    h = calculate_h(x_surface, y_surface)
-
+    # h = calculate_h(x_surface, y_surface)
+    #
     # trace1 = go.Scatter3d(x=x, y=y, z=z, mode='markers', marker=dict(size=5, color=z))
     # trace2 = go.Surface(z=h, x=x_surface, y=y_surface, colorscale='Viridis', opacity=0.5)
     #
     # fig = go.Figure(data=[trace1, trace2])
     # fig.show()
 
-    # Create 3D plot of the data points and the fitted curve
+    #Create 3D plot of the data points and the fitted curve
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.scatter(x, y, z, color='blue', alpha=0.1)
@@ -71,7 +75,7 @@ if __name__ == '__main__':
     ax.set_zlabel('Z')
     plt.show()
 
-    # train_error_list = []
+    # Train weights for the gaussian surface.
     for ite in range(iterations):
         # Positive examples
         for i in range(len(x)):
